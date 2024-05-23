@@ -26,3 +26,14 @@ pub fn size() -> HashMap<String, f64> {
 pub fn scale() -> f64 {
     autopilot::screen::scale()
 }
+
+pub fn is_point_visible(x: f64, y: f64) -> bool {
+    let point = autopilot::geometry::Point::new(x, y);
+    autopilot::screen::is_point_visible(point)
+}
+
+pub fn is_rect_visible(x: f64, y: f64, width: f64, height: f64) -> bool {
+    let point = autopilot::geometry::Point::new(x, y);
+    let size = autopilot::geometry::Size::new(width, height);
+    autopilot::screen::is_rect_visible(autopilot::geometry::Rect::new(point, size))
+}

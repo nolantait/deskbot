@@ -121,4 +121,20 @@ module Deskbot
   def screen_scale
     _screen_scale
   end
+
+  def point_visible?(x, y) # rubocop:disable Naming/MethodParameterName
+    _is_point_visible(
+      Types::Coercible::Float[x],
+      Types::Coercible::Float[y]
+    )
+  end
+
+  def rect_visible?(x:, y:, width:, height:) # rubocop:disable Naming/MethodParameterName
+    _is_rect_visible(
+      Types::Coercible::Float[x],
+      Types::Coercible::Float[y],
+      Types::Coercible::Float[width],
+      Types::Coercible::Float[height]
+    )
+  end
 end
