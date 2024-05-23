@@ -7,6 +7,7 @@ require_relative "deskbot/version"
 require_relative "deskbot/deskbot"
 require_relative "deskbot/types"
 require_relative "deskbot/point"
+require_relative "deskbot/color"
 
 module Deskbot
   class Error < StandardError; end
@@ -100,6 +101,15 @@ module Deskbot
     _scroll(
       ScrollDirection[direction],
       Types::Integer[clicks]
+    )
+  end
+
+  def get_color(x, y) # rubocop:disable Naming/MethodParameterName
+    Color.new(
+      _get_color(
+        Types::Coercible::Float[x],
+        Types::Coercible::Float[y]
+      )
     )
   end
 end

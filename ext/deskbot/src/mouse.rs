@@ -1,4 +1,3 @@
-use magnus::{function, prelude::*, Error, RArray, Ruby};
 extern crate autopilot;
 use std::collections::HashMap;
 

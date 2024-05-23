@@ -3,6 +3,7 @@ extern crate autopilot;
 
 mod keys;
 mod mouse;
+mod screen;
 
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -17,5 +18,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_singleton_method("_click", function!(mouse::click, 2))?;
     module.define_singleton_method("_scroll", function!(mouse::scroll, 2))?;
     module.define_singleton_method("_smooth_move_mouse", function!(mouse::smooth_move, 3))?;
+
+    module.define_singleton_method("_get_color", function!(screen::get_color, 2))?;
     Ok(())
 }
