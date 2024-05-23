@@ -55,4 +55,11 @@ module Deskbot
   def mouse_location
     Point.new(_location)
   end
+
+  def move_mouse(x, y) # rubocop:disable Naming/MethodParameterName
+    _move_to(
+      Types::Coercible::Float[x],
+      Types::Coercible::Float[y]
+    )
+  end
 end

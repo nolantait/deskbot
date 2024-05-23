@@ -53,6 +53,14 @@ mod mouse {
         ]);
 
     }
+
+    pub fn move_to(x: f64, y: f64) -> bool {
+        let command = autopilot::mouse::move_to(autopilot::geometry::Point::new(x, y));
+        match command {
+            Ok(_) => true,
+            Err(_) => false
+        }
+    }
 }
 
 #[magnus::init]
@@ -63,5 +71,6 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_singleton_method("_tap", function!(keys::tap, 4))?;
 
     module.define_singleton_method("_location", function!(mouse::location, 0))?;
+    module.define_singleton_method("_move_to", function!(mouse::move_to, 2))?;
     Ok(())
 }
