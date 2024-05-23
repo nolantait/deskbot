@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Deskbot
   class Color < Dry::Struct
     attribute :red, Types::Integer
