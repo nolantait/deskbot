@@ -20,7 +20,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
 Type something on the keyboard
 
 ```ruby
-Deskbot.type_string("something", flag: :shift, wpm: 60.0, noise: 0.0)
+Deskbot.type_string("something", flags: [:shift], wpm: 60.0, noise: 0.0)
 ```
 
 This would type `SOMETHING` at 60 wpm.
