@@ -74,6 +74,14 @@ module Deskbot
     )
   end
 
+  def smooth_move_mouse(x, y, duration: 1) # rubocop:disable Naming/MethodParameterName
+    _smooth_move_mouse(
+      Types::Coercible::Float[x],
+      Types::Coercible::Float[y],
+      Types::Coercible::Float[duration]
+    )
+  end
+
   def toggle_mouse(button = "left", down: true)
     _toggle_mouse(
       Button[button],

@@ -79,6 +79,18 @@ mod mouse {
         }
     }
 
+    pub fn smooth_move(x: f64, y: f64, duration: Option<f64>) -> bool {
+        let command = autopilot::mouse::smooth_move(
+            autopilot::geometry::Point::new(x, y),
+            duration
+        );
+
+        match command {
+            Ok(_) => true,
+            Err(_) => false
+        }
+    }
+
     pub fn toggle(_button: String, down: bool) -> () {
         let button = button(_button);
         autopilot::mouse::toggle(button, down);
@@ -106,5 +118,6 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_singleton_method("_toggle_mouse", function!(mouse::toggle, 2))?;
     module.define_singleton_method("_click", function!(mouse::click, 2))?;
     module.define_singleton_method("_scroll", function!(mouse::scroll, 2))?;
+    module.define_singleton_method("_smooth_move_mouse", function!(mouse::smooth_move, 3))?;
     Ok(())
 }
