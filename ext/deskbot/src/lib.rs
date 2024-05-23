@@ -54,6 +54,14 @@ mod mouse {
         }
     }
 
+    fn scroll_direction(symbol: String) -> autopilot::mouse::ScrollDirection {
+        match symbol.as_str() {
+            "up" => autopilot::mouse::ScrollDirection::Up,
+            "down" => autopilot::mouse::ScrollDirection::Down,
+            _ => panic!("Invalid scroll direction"),
+        }
+    }
+
     pub fn location() -> HashMap<String, f64> {
         let point = autopilot::mouse::location();
         return HashMap::from([
@@ -80,6 +88,10 @@ mod mouse {
         let button = button(_button);
         autopilot::mouse::click(button, delay_ms);
     }
+
+    pub fn scroll(direction: String, clicks: u32) -> () {
+        autopilot::mouse::scroll(scroll_direction(direction), clicks);
+    }
 }
 
 #[magnus::init]
@@ -92,6 +104,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_singleton_method("_mouse_location", function!(mouse::location, 0))?;
     module.define_singleton_method("_move_mouse", function!(mouse::move_to, 2))?;
     module.define_singleton_method("_toggle_mouse", function!(mouse::toggle, 2))?;
-    module.define_singleton_method("_click_mouse", function!(mouse::click, 2))?;
+    module.define_singleton_method("_click", function!(mouse::click, 2))?;
+    module.define_singleton_method("_scroll", function!(mouse::scroll, 2))?;
     Ok(())
 }

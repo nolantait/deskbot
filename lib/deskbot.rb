@@ -31,6 +31,11 @@ module Deskbot
 
   Character = Types::Coercible::String.constrained(size: 1)
 
+  ScrollDirection = Types::Coercible::String.enum(
+    "up",
+    "down"
+  )
+
   def type(text, flags: [], wpm: 60.0, noise: 0.0)
     _type_string(
       Types::String[text],
@@ -76,10 +81,17 @@ module Deskbot
     )
   end
 
-  def click_mouse(button = "left", delay_ms: nil)
-    _click_mouse(
+  def click(button = "left", delay_ms: nil)
+    _click(
       Button[button],
       Types::Float.optional[delay_ms]
+    )
+  end
+
+  def scroll(direction = "up", clicks: 1)
+    _scroll(
+      ScrollDirection[direction],
+      Types::Integer[clicks]
     )
   end
 end
