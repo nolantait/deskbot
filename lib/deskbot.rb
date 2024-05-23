@@ -69,14 +69,14 @@ module Deskbot
     )
   end
 
-  def toggle_mouse(button, down: true)
+  def toggle_mouse(button = "left", down: true)
     _toggle_mouse(
       Button[button],
       Types::Bool[down]
     )
   end
 
-  def click_mouse(button, delay_ms: nil)
+  def click_mouse(button = "left", delay_ms: nil)
     _click_mouse(
       Button[button],
       Types::Float.optional[delay_ms]
