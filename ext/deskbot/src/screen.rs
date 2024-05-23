@@ -13,3 +13,16 @@ pub fn get_color(x: f64, y: f64) -> Option<HashMap<String, u8>> {
         Err(_) => None
     }
 }
+
+pub fn size() -> HashMap<String, f64> {
+    let size = autopilot::screen::size();
+
+    HashMap::from([
+        ("width".to_string(), size.width),
+        ("height".to_string(), size.height)
+    ])
+}
+
+pub fn scale() -> f64 {
+    autopilot::screen::scale()
+}

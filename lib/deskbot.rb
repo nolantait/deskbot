@@ -8,6 +8,7 @@ require_relative "deskbot/deskbot"
 require_relative "deskbot/types"
 require_relative "deskbot/point"
 require_relative "deskbot/color"
+require_relative "deskbot/size"
 
 module Deskbot
   class Error < StandardError; end
@@ -111,5 +112,13 @@ module Deskbot
         Types::Coercible::Float[y]
       )
     )
+  end
+
+  def screen_size
+    Size.new(_screen_size)
+  end
+
+  def screen_scale
+    _screen_scale
   end
 end

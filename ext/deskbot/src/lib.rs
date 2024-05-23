@@ -20,5 +20,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_singleton_method("_smooth_move_mouse", function!(mouse::smooth_move, 3))?;
 
     module.define_singleton_method("_get_color", function!(screen::get_color, 2))?;
+    module.define_singleton_method("_screen_size", function!(screen::size, 0))?;
+    module.define_singleton_method("_screen_scale", function!(screen::scale, 0))?;
     Ok(())
 }
