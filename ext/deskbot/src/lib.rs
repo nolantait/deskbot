@@ -1,10 +1,15 @@
-use magnus::{function, prelude::*, Error, Ruby, Symbol};
+use magnus::{function, prelude::*, Error, Ruby, RArray};
 extern crate autopilot;
 
-fn key_flag_from_symbol(symbol: Symbol) -> Option<autopilot::key::Flag> {
-    let name = symbol.name().unwrap().to_string();
+fn key_flags_from_symbols(symbols: Vec<String>) -> Vec<autopilot::key::Flag> {
+    symbols
+        .iter()
+        .filter_map(|symbol| key_flag_from_symbol(symbol))
+        .collect::<Vec<autopilot::key::Flag>>()
+}
 
-    match name.as_str() {
+fn key_flag_from_symbol(symbol: &String) -> Option<autopilot::key::Flag> {
+    match symbol.as_str() {
         "shift" => Some(autopilot::key::Flag::Shift),
         "control" => Some(autopilot::key::Flag::Control),
         "alt" => Some(autopilot::key::Flag::Alt),
@@ -14,12 +19,10 @@ fn key_flag_from_symbol(symbol: Symbol) -> Option<autopilot::key::Flag> {
     }
 }
 
-fn type_string(string: String, _flag: Symbol, wpm: f64, noise: f64) -> () {
-    if let Some(flag) = key_flag_from_symbol(_flag) {
-        autopilot::key::type_string(&string, &[flag], wpm, noise);
-    } else {
-        autopilot::key::type_string(&string, &[], wpm, noise);
-    }
+fn type_string(string: String, _flag: RArray, wpm: f64, noise: f64) -> () {
+    let _flags = _flag.to_vec::<String>().unwrap();
+    let flags = key_flags_from_symbols(_flags);
+    autopilot::key::type_string(&string, &flags, wpm, noise);
 }
 
 #[magnus::init]
