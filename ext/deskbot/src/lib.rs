@@ -4,14 +4,14 @@ extern crate autopilot;
 mod keys {
     use super::*;
 
-    fn key_flags_from_symbols(symbols: Vec<String>) -> Vec<autopilot::key::Flag> {
+    fn key_flags(symbols: Vec<String>) -> Vec<autopilot::key::Flag> {
         symbols
             .iter()
-            .filter_map(|symbol| key_flag_from_symbol(symbol))
+            .filter_map(|symbol| key_flag(symbol))
             .collect::<Vec<autopilot::key::Flag>>()
     }
 
-    fn key_flag_from_symbol(symbol: &String) -> Option<autopilot::key::Flag> {
+    fn key_flag(symbol: &String) -> Option<autopilot::key::Flag> {
         match symbol.as_str() {
             "shift" => Some(autopilot::key::Flag::Shift),
             "control" => Some(autopilot::key::Flag::Control),
@@ -24,18 +24,18 @@ mod keys {
 
     pub fn type_string(string: String, _flag: RArray, wpm: f64, noise: f64) -> () {
         let _flags = _flag.to_vec::<String>().unwrap();
-        let flags = key_flags_from_symbols(_flags);
+        let flags = key_flags(_flags);
         autopilot::key::type_string(&string, &flags, wpm, noise);
     }
 
-    pub fn toggle(_key: char, down: bool, _flags: RArray, modifier_delay_ms: u64) -> () {
-        let flags = key_flags_from_symbols(_flags.to_vec::<String>().unwrap());
+    pub fn toggle_key(_key: char, down: bool, _flags: RArray, modifier_delay_ms: u64) -> () {
+        let flags = key_flags(_flags.to_vec::<String>().unwrap());
         let key = autopilot::key::Character(_key);
         autopilot::key::toggle(&key, down, &flags, modifier_delay_ms);
     }
 
-    pub fn tap(_key: char, _flags: RArray, delay_ms: u64, modifier_delay_ms: u64) -> () {
-        let flags = key_flags_from_symbols(_flags.to_vec::<String>().unwrap());
+    pub fn tap_key(_key: char, _flags: RArray, delay_ms: u64, modifier_delay_ms: u64) -> () {
+        let flags = key_flags(_flags.to_vec::<String>().unwrap());
         let key = autopilot::key::Character(_key);
         autopilot::key::tap(&key, &flags, delay_ms, modifier_delay_ms);
     }
@@ -44,6 +44,15 @@ mod keys {
 mod mouse {
     use super::*;
     use std::collections::HashMap;
+
+    fn button(symbol: String) -> autopilot::mouse::Button {
+        match symbol.as_str() {
+            "left" => autopilot::mouse::Button::Left,
+            "middle" => autopilot::mouse::Button::Middle,
+            "right" => autopilot::mouse::Button::Right,
+            _ => panic!("Invalid button"),
+        }
+    }
 
     pub fn location() -> HashMap<String, f64> {
         let point = autopilot::mouse::location();
@@ -61,16 +70,28 @@ mod mouse {
             Err(_) => false
         }
     }
+
+    pub fn toggle(_button: String, down: bool) -> () {
+        let button = button(_button);
+        autopilot::mouse::toggle(button, down);
+    }
+
+    pub fn click(_button: String, delay_ms: Option<u64>) -> () {
+        let button = button(_button);
+        autopilot::mouse::click(button, delay_ms);
+    }
 }
 
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
     let module = ruby.define_module("Deskbot")?;
     module.define_singleton_method("_type_string", function!(keys::type_string, 4))?;
-    module.define_singleton_method("_toggle", function!(keys::toggle, 4))?;
-    module.define_singleton_method("_tap", function!(keys::tap, 4))?;
+    module.define_singleton_method("_toggle_key", function!(keys::toggle_key, 4))?;
+    module.define_singleton_method("_tap_key", function!(keys::tap_key, 4))?;
 
-    module.define_singleton_method("_location", function!(mouse::location, 0))?;
-    module.define_singleton_method("_move_to", function!(mouse::move_to, 2))?;
+    module.define_singleton_method("_mouse_location", function!(mouse::location, 0))?;
+    module.define_singleton_method("_move_mouse", function!(mouse::move_to, 2))?;
+    module.define_singleton_method("_toggle_mouse", function!(mouse::toggle, 2))?;
+    module.define_singleton_method("_click_mouse", function!(mouse::click, 2))?;
     Ok(())
 }
