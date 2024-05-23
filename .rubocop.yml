@@ -1,0 +1,6 @@
+require:
+  - rubocop-inhouse
+
+inherit_gem:
+  rubocop-inhouse:
+    - config/default.yml
