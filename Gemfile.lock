@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     deskbot (0.1.0)
+      dry-types
 
 GEM
   remote: https://rubygems.org/
@@ -23,6 +24,21 @@ GEM
     connection_pool (2.4.1)
     diff-lcs (1.5.1)
     drb (2.2.1)
+    dry-core (1.0.1)
+      concurrent-ruby (~> 1.0)
+      zeitwerk (~> 2.6)
+    dry-inflector (1.0.0)
+    dry-logic (1.5.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.0, < 2)
+      zeitwerk (~> 2.6)
+    dry-types (1.7.2)
+      bigdecimal (~> 3.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.0)
+      dry-inflector (~> 1.0)
+      dry-logic (~> 1.4)
+      zeitwerk (~> 2.6)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     json (2.7.2)
@@ -102,6 +118,7 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
+    zeitwerk (2.6.14)
 
 PLATFORMS
   ruby

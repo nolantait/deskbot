@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.extensions = ["ext/deskbot/Cargo.toml"]
 
   # Uncomment to register a new dependency of your gem
-  # spec.add_dependency "example-gem", "~> 1.0"
+  spec.add_dependency "dry-types"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
