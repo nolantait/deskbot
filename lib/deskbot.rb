@@ -137,4 +137,17 @@ module Deskbot
       Types::Coercible::Float[height]
     )
   end
+
+  def capture_screen
+    _capture_screen
+  end
+
+  def capture_screen_portion(x:, y:, width:, height:) # rubocop:disable Naming/MethodParameterName
+    _capture_screen_portion(
+      Types::Coercible::Float[x],
+      Types::Coercible::Float[y],
+      Types::Coercible::Float[width],
+      Types::Coercible::Float[height]
+    )
+  end
 end

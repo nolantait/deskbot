@@ -1,9 +1,10 @@
-use magnus::{function, prelude::*, Error, Ruby};
+use magnus::{function, prelude::*, Error, Ruby, method, class};
 extern crate autopilot;
 
 mod keys;
 mod mouse;
 mod screen;
+mod bitmap;
 
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -24,5 +25,11 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_singleton_method("_screen_scale", function!(screen::scale, 0))?;
     module.define_singleton_method("_is_point_visible", function!(screen::is_point_visible, 2))?;
     module.define_singleton_method("_is_rect_visible", function!(screen::is_rect_visible, 4))?;
+
+    module.define_singleton_method("_capture_screen_portion", function!(bitmap::capture_screen_portion, 4))?;
+    module.define_singleton_method("_capture_screen", function!(bitmap::capture_screen, 0))?;
+
+    let bitmap = ruby.define_class("Bitmap", class::object())?;
+    bitmap.define_method("bounds", method!(bitmap::Bitmap::bounds, 0))?;
     Ok(())
 }
