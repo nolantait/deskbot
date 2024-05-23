@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require "dry/types"
+require "dry/struct"
 
 require_relative "deskbot/version"
 require_relative "deskbot/deskbot"
 require_relative "deskbot/types"
+require_relative "deskbot/point"
 
 module Deskbot
   class Error < StandardError; end
@@ -23,15 +25,34 @@ module Deskbot
 
   Character = Types::Coercible::String.constrained(size: 1)
 
-  def type_string(text, flags: [], wpm: 60.0, noise: 0.0)
-    _type_string(text, Flags[flags], wpm, noise)
+  def type(text, flags: [], wpm: 60.0, noise: 0.0)
+    _type_string(
+      Types::String[text],
+      Flags[flags],
+      Types::Float[wpm],
+      Types::Float[noise]
+    )
   end
 
   def toggle(key, down: true, flags: [], modifier_delay_ms: 0.0)
-    _toggle(Character[key], down, Flags[flags], modifier_delay_ms)
+    _toggle(
+      Character[key],
+      Types::Bool[down],
+      Flags[flags],
+      Types::Float[modifier_delay_ms]
+    )
   end
 
   def tap(key, flags: [], delay_ms: 0.0, modifier_delay_ms: 0.0)
-    _tap(Character[key], Flags[flags], delay_ms, modifier_delay_ms)
+    _tap(
+      Character[key],
+      Flags[flags],
+      Types::Float[delay_ms],
+      Types::Float[modifier_delay_ms]
+    )
+  end
+
+  def mouse_location
+    Point.new(_location)
   end
 end

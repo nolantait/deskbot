@@ -1,4 +1,4 @@
-use magnus::{function, prelude::*, Error, Ruby, RArray};
+use magnus::{function, prelude::*, Error, RArray, Ruby};
 extern crate autopilot;
 
 mod keys {
@@ -41,11 +41,27 @@ mod keys {
     }
 }
 
+mod mouse {
+    use super::*;
+    use std::collections::HashMap;
+
+    pub fn location() -> HashMap<String, f64> {
+        let point = autopilot::mouse::location();
+        return HashMap::from([
+            ("x".to_string(), point.x),
+            ("y".to_string(), point.y),
+        ]);
+
+    }
+}
+
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
     let module = ruby.define_module("Deskbot")?;
     module.define_singleton_method("_type_string", function!(keys::type_string, 4))?;
     module.define_singleton_method("_toggle", function!(keys::toggle, 4))?;
     module.define_singleton_method("_tap", function!(keys::tap, 4))?;
+
+    module.define_singleton_method("_location", function!(mouse::location, 0))?;
     Ok(())
 }
