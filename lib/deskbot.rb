@@ -9,6 +9,8 @@ require_relative "deskbot/types"
 require_relative "deskbot/point"
 require_relative "deskbot/color"
 require_relative "deskbot/size"
+require_relative "deskbot/area"
+require_relative "deskbot/bitmap"
 
 module Deskbot
   class Error < StandardError; end

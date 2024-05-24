@@ -1,8 +1,9 @@
 extern crate autopilot;
 
+use image::open;
 use std::collections::HashMap;
 
-#[magnus::wrap(class = "Bitmap")]
+#[magnus::wrap(class = "Deskbot::Bitmap")]
 pub struct Bitmap(autopilot::bitmap::Bitmap);
 
 impl Bitmap {
@@ -19,6 +20,23 @@ impl Bitmap {
             ("width".to_string(), bounds.size.width),
             ("height".to_string(), bounds.size.height),
         ])
+    }
+
+    pub fn find(&self, image_path: String) -> Option<HashMap<String, f64>> {
+        if let Ok(image) = open(image_path) {
+            let bitmap = autopilot::bitmap::Bitmap::new(image, None);
+            let bounds = bitmap.bounds();
+
+            let hash = HashMap::from([
+                ("x".to_string(), bounds.origin.x),
+                ("y".to_string(), bounds.origin.y),
+                ("width".to_string(), bounds.size.width),
+                ("height".to_string(), bounds.size.height),
+            ]);
+
+            return Some(hash)
+        }
+        None
     }
 }
 

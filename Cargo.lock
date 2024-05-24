@@ -209,6 +209,7 @@ name = "deskbot"
 version = "0.1.0"
 dependencies = [
  "autopilot",
+ "image",
  "magnus",
 ]
 
