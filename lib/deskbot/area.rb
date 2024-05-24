@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Deskbot
   class Area < Dry::Struct
     attribute :x, Types::Float

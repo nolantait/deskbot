@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Deskbot
   class Bitmap
     def bounds
