@@ -22,20 +22,32 @@ impl Bitmap {
         ])
     }
 
-    pub fn find(&self, image_path: String) -> Option<HashMap<String, f64>> {
+    pub fn find(&self, image_path: String, tolerance: Option<f64>) -> Option<HashMap<String, f64>> {
         if let Ok(image) = open(image_path) {
             let needle = autopilot::bitmap::Bitmap::new(image, None);
 
-            if let Some(found) = self.0.find_bitmap(&needle, Some(0.0), None, None) {
-                return Some(
-                    HashMap::from([
-                        ("x".to_string(), found.x),
-                        ("y".to_string(), found.y),
-                    ])
-                );
+            if let Some(found) = self.0.find_bitmap(&needle, tolerance, None, None) {
+                return Some(HashMap::from([
+                    ("x".to_string(), found.x),
+                    ("y".to_string(), found.y),
+                ]));
             }
         }
         None
+    }
+
+    pub fn all(&self, image_path: String, tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
+        let mut results = vec![];
+        if let Ok(image) = open(image_path) {
+            let needle = autopilot::bitmap::Bitmap::new(image, None);
+            for found in self.0.find_every_bitmap(&needle, tolerance, None, None) {
+                results.push(HashMap::from([
+                    ("x".to_string(), found.x),
+                    ("y".to_string(), found.y),
+                ]));
+            }
+        }
+        results
     }
 }
 

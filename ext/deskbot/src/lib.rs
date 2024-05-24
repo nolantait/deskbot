@@ -34,6 +34,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
 
     let bitmap = module.define_class("Bitmap", class::object())?;
     bitmap.define_method("_bounds", method!(bitmap::Bitmap::bounds, 0))?;
-    bitmap.define_method("_find", method!(bitmap::Bitmap::find, 1))?;
+    bitmap.define_method("_find", method!(bitmap::Bitmap::find, 2))?;
+    bitmap.define_method("_all", method!(bitmap::Bitmap::all, 2))?;
     Ok(())
 }
