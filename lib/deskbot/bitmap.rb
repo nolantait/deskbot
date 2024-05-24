@@ -5,7 +5,7 @@ module Deskbot
     end
 
     def find(image_path)
-      Area.new(_find(image_path))
+      Point.new(_find(image_path))
     end
   end
 end

@@ -24,17 +24,16 @@ impl Bitmap {
 
     pub fn find(&self, image_path: String) -> Option<HashMap<String, f64>> {
         if let Ok(image) = open(image_path) {
-            let bitmap = autopilot::bitmap::Bitmap::new(image, None);
-            let bounds = bitmap.bounds();
+            let needle = autopilot::bitmap::Bitmap::new(image, None);
 
-            let hash = HashMap::from([
-                ("x".to_string(), bounds.origin.x),
-                ("y".to_string(), bounds.origin.y),
-                ("width".to_string(), bounds.size.width),
-                ("height".to_string(), bounds.size.height),
-            ]);
-
-            return Some(hash)
+            if let Some(found) = self.0.find_bitmap(&needle, Some(0.0), None, None) {
+                return Some(
+                    HashMap::from([
+                        ("x".to_string(), found.x),
+                        ("y".to_string(), found.y),
+                    ])
+                );
+            }
         }
         None
     }
