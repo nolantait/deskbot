@@ -51,9 +51,9 @@ Gem::Specification.new do |spec|
   spec.extensions = ["ext/deskbot/Cargo.toml"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "dry-matcher"
-  spec.add_dependency "dry-monads"
-  spec.add_dependency "dry-struct"
-  spec.add_dependency "dry-types"
+  spec.add_dependency "dry-matcher", "~> 1.0"
+  spec.add_dependency "dry-monads", "~> 1.6"
+  spec.add_dependency "dry-struct", "~> 1.6"
+  spec.add_dependency "dry-types", "~> 1.7"
   spec.metadata["rubygems_mfa_required"] = "true"
 end
