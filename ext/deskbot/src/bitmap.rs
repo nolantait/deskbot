@@ -196,12 +196,12 @@ impl Bitmap {
         }
     }
 
-    fn write_image(&self, path: &str, image: &Mat) {
-        match opencv::imgcodecs::imwrite(path, image, &core::Vector::<i32>::new()) {
-            Ok(_) => {}
-            Err(error) => panic!("Could not write the image: {}", error),
-        }
-    }
+    // fn write_image(&self, path: &str, image: &Mat) {
+    //     match opencv::imgcodecs::imwrite(path, image, &core::Vector::<i32>::new()) {
+    //         Ok(_) => {}
+    //         Err(error) => panic!("Could not write the image: {}", error),
+    //     }
+    // }
 
     fn match_template(&self, image: &Mat, template: &Mat, threshold: f64) -> Option<core::Point> {
         let mut result = Mat::default();
@@ -210,8 +210,6 @@ impl Bitmap {
             .unwrap();
 
         let (min_point, min_val) = self.minimum_point(&result);
-
-        println!("Min value: {}", min_val);
 
         if min_val > threshold {
             return None;
