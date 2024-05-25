@@ -2,6 +2,13 @@
 
 module Deskbot
   class Bitmap
+    include Dry::Monads[:result]
+    include Dry::Matcher.for(
+      :find_color,
+      :find,
+      with: Dry::Matcher::ResultMatcher
+    )
+
     Rgba = Types::Array
       .of(Types::Integer.constrained(gteq: 0, lteq: 255))
       .constrained(size: 4)
@@ -27,21 +34,29 @@ module Deskbot
     end
 
     def find(image_path, tolerance: nil)
-      Point.new(
-        @provider.find(
-          Types::String[image_path],
-          Types::Float.optional[tolerance]
-        )
+      result = @provider.find(
+        Types::String[image_path],
+        Types::Float.optional[tolerance]
       )
+
+      if result
+        Success(Point.new(result))
+      else
+        Failure(:not_found)
+      end
     end
 
     def find_color(color, tolerance: nil)
-      Point.new(
-        @provider.find_color(
-          Rgba[color],
-          Types::Float.optional[tolerance]
-        )
+      found = @provider.find_color(
+        Rgba[color],
+        Types::Float.optional[tolerance]
       )
+
+      if found
+        Success(Point.new(found))
+      else
+        Failure(:not_found)
+      end
     end
 
     def all(image_path, tolerance: nil)

@@ -2,6 +2,8 @@
 
 require "dry/types"
 require "dry/struct"
+require "dry/monads"
+require "dry/matcher/result_matcher"
 
 require_relative "deskbot/version"
 require_relative "deskbot/deskbot"

@@ -2,6 +2,8 @@ PATH
   remote: .
   specs:
     deskbot (0.1.0)
+      dry-matcher
+      dry-monads
       dry-struct
       dry-types
 
@@ -30,6 +32,12 @@ GEM
       zeitwerk (~> 2.6)
     dry-inflector (1.0.0)
     dry-logic (1.5.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.0, < 2)
+      zeitwerk (~> 2.6)
+    dry-matcher (1.0.0)
+      dry-core (~> 1.0, < 2)
+    dry-monads (1.6.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0, < 2)
       zeitwerk (~> 2.6)
