@@ -20,8 +20,6 @@ require "deskbot/screen"
 module Deskbot
   class Error < StandardError; end
 
-  module_function
-
   def self.screen(provider: Providers::Autopilot)
     @screen ||= Screen.new(provider)
   end

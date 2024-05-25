@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Deskbot::Screen do
   let(:screen) { described_class.new(provider) }
 

@@ -9,7 +9,6 @@ module Deskbot
 
     transform_keys do |key|
       {
-        # rubocop:disable Style/StringHashKeys
         "r" => :red,
         "g" => :green,
         "b" => :blue,

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Deskbot
   class Screen
     # This is the API for any provider

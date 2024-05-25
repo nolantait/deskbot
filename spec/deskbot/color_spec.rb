@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Deskbot::Color do
   describe ".from_hex" do
     it "parses a hex color" do
