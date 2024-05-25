@@ -7,7 +7,7 @@ for Ruby.
 
 This library uses [dry-types](https://dry-rb.org/gems/dry-types/1.7/) so the
 arguments should be well documented in
-the `lib/deskbot.rb` and `lib/deskbot/bitmap.rb` files
+the `lib/deskbot/screen.rb` and `lib/deskbot/bitmap.rb` files
 
 ## Installation
 
