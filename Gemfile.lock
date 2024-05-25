@@ -2,10 +2,10 @@ PATH
   remote: .
   specs:
     deskbot (0.1.0)
-      dry-matcher
-      dry-monads
-      dry-struct
-      dry-types
+      dry-matcher (~> 1.0)
+      dry-monads (~> 1.6)
+      dry-struct (~> 1.6)
+      dry-types (~> 1.7)
 
 GEM
   remote: https://rubygems.org/

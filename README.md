@@ -16,6 +16,9 @@ so I've rewritten matching templates to use
 
 ## Installation
 
+You will need to have installed [Rust](https://www.rust-lang.org/tools/install) and
+[opencv](https://github.com/twistedfall/opencv-rust/blob/master/INSTALL.md)
+
 Install the gem and add to the application's Gemfile by executing:
 
     $ bundle add deskbot
