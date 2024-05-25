@@ -5,7 +5,9 @@ RSpec.describe Deskbot do
     expect(Deskbot::VERSION).not_to be_nil
   end
 
-  it "does something useful" do
-    expect(false).to be(true)
+  describe ".screen" do
+    it "returns a screen" do
+      expect(described_class.screen).to be_a(Deskbot::Screen)
+    end
   end
 end
