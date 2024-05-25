@@ -3,15 +3,12 @@ extern crate autopilot;
 use image::open;
 use magnus::exception;
 use std::collections::HashMap;
-use std::path::Path;
-
 
 extern crate opencv;
 
 use opencv::{
-    core::{self, Mat},
-    imgproc,
-    Result,
+    core::{self, Mat, MatTraitConst, Rect, Scalar},
+    imgproc, Result,
 };
 
 #[magnus::wrap(class = "Deskbot::Providers::Autopilot::Bitmap")]
@@ -65,7 +62,10 @@ impl Bitmap {
     }
 
     pub fn find(&self, image_path: String, tolerance: Option<f64>) -> Option<HashMap<String, f64>> {
-        let src = match opencv::imgcodecs::imread("./tmp/last-screenshot.png", opencv::imgcodecs::IMREAD_COLOR) {
+        let src = match opencv::imgcodecs::imread(
+            "./tmp/last-screenshot.png",
+            opencv::imgcodecs::IMREAD_COLOR,
+        ) {
             Ok(src) => src,
             Err(error) => panic!("Could not read the image: {}", error),
         };
@@ -86,7 +86,7 @@ impl Bitmap {
             imgproc::TemplateMatchModes::TM_SQDIFF_NORMED.into(),
             &mask,
         ) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(error) => panic!("Could not match the template: {}", error),
         }
 
@@ -103,7 +103,7 @@ impl Bitmap {
             Some(&mut max_point),
             &mask,
         ) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(error) => panic!("Could not find the min max loc: {}", error),
         }
 
@@ -111,12 +111,10 @@ impl Bitmap {
             return None;
         }
 
-        Some(
-            HashMap::from([
-                ("x".to_string(), min_point.x as f64),
-                ("y".to_string(), min_point.y as f64),
-            ])
-        )
+        Some(HashMap::from([
+            ("x".to_string(), min_point.x as f64),
+            ("y".to_string(), min_point.y as f64),
+        ]))
     }
 
     pub fn all_color(&self, color: [u8; 4], tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
@@ -135,15 +133,32 @@ impl Bitmap {
 
     pub fn all(&self, image_path: String, tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
         let mut results = vec![];
-        if let Ok(image) = open(image_path) {
-            let needle = autopilot::bitmap::Bitmap::new(image, None);
-            for found in self.0.find_every_bitmap(&needle, tolerance, None, None) {
-                results.push(HashMap::from([
-                    ("x".to_string(), found.x),
-                    ("y".to_string(), found.y),
-                ]));
+
+        let mut image = self.load_image("./tmp/last-screenshot.png");
+        let template_image = self.load_image(&image_path);
+        let mut matches: Vec<core::Point> = Vec::new();
+
+        // Fake out min_val for first run through loop
+        loop {
+            match self.match_template_and_replace(
+                &mut image,
+                &template_image,
+                tolerance.unwrap_or(0.5)
+            ) {
+                Some(point) => {
+                    matches.push(point);
+                }
+                None => break,
             }
         }
+
+        matches.iter().for_each(|point| {
+            results.push(HashMap::from([
+                ("x".to_string(), point.x as f64),
+                ("y".to_string(), point.y as f64),
+            ]));
+        });
+
         results
     }
 
@@ -153,6 +168,77 @@ impl Bitmap {
             return self.0.count_of_bitmap(&needle, tolerance, None, None);
         }
         0
+    }
+
+    fn minimum_point(&self, mat: &Mat) -> (core::Point, f64) {
+        let mut min_val = 1.;
+        let mut min_point = core::Point { x: 0, y: 0 };
+
+        match core::min_max_loc(
+            &mat,
+            Some(&mut min_val),
+            None,
+            Some(&mut min_point),
+            None,
+            &core::no_array(),
+        ) {
+            Ok(_) => {}
+            Err(error) => panic!("Could not find the min max loc: {}", error),
+        }
+
+        (min_point, min_val)
+    }
+
+    fn load_image(&self, path: &str) -> Mat {
+        match opencv::imgcodecs::imread(path, opencv::imgcodecs::IMREAD_COLOR) {
+            Ok(src) => src,
+            Err(error) => panic!("Could not read the image: {}", error),
+        }
+    }
+
+    fn write_image(&self, path: &str, image: &Mat) {
+        match opencv::imgcodecs::imwrite(path, image, &core::Vector::<i32>::new()) {
+            Ok(_) => {}
+            Err(error) => panic!("Could not write the image: {}", error),
+        }
+    }
+
+    fn match_template(&self, image: &Mat, template: &Mat, threshold: f64) -> Option<core::Point> {
+        let mut result = Mat::default();
+
+        imgproc::match_template_def(image, &template, &mut result, imgproc::TM_SQDIFF_NORMED)
+            .unwrap();
+
+        let (min_point, min_val) = self.minimum_point(&result);
+
+        println!("Min value: {}", min_val);
+
+        if min_val > threshold {
+            return None;
+        }
+
+        Some(min_point)
+    }
+
+    fn match_template_and_replace(
+        &self,
+        image: &mut Mat,
+        template: &Mat,
+        threshold: f64,
+    ) -> Option<core::Point> {
+        let min_point = self.match_template(image, template, threshold)?;
+        let template_size = template.size().unwrap();
+
+        let rect = Rect {
+            x: min_point.x,
+            y: min_point.y,
+            width: template_size.width as i32 + 1,
+            height: template_size.height as i32 + 1,
+        };
+
+        imgproc::rectangle(image, rect, Scalar::new(0.0, 0.0, 0.0, 0.0), -1, 8, 0).unwrap();
+
+        Some(min_point)
     }
 }
 
@@ -166,7 +252,7 @@ pub fn capture_screen_portion(x: f64, y: f64, width: f64, height: f64) -> Option
         Ok(image) => {
             image.image.save("./tmp/last-screenshot.png").unwrap();
             Some(Bitmap::new(image))
-        },
+        }
         Err(_) => None,
     }
 }
@@ -178,7 +264,7 @@ pub fn capture_screen() -> Option<Bitmap> {
         Ok(image) => {
             image.image.save("./tmp/last-screenshot.png").unwrap();
             Some(Bitmap::new(image))
-        },
+        }
         Err(_) => None,
     }
 }
