@@ -103,20 +103,20 @@ RSpec.describe Deskbot::Screen do
     end
   end
 
-  describe "#screen_size" do
+  describe "#size" do
     let(:provider) { double("provider", screen_size: { "width" => 1920.0, "height" => 1080.0 }) }
 
     it "returns a size" do
-      size = screen.screen_size
+      size = screen.size
       expect(size).to be_a(Deskbot::Size)
     end
   end
 
-  describe "#screen_scale" do
+  describe "#scale" do
     let(:provider) { double("provider", screen_scale: 1.0) }
 
     it "returns a float" do
-      expect(screen.screen_scale).to eq 1.0
+      expect(screen.scale).to eq 1.0
     end
   end
 
@@ -136,19 +136,19 @@ RSpec.describe Deskbot::Screen do
     end
   end
 
-  describe "#capture_screen" do
+  describe "#capture" do
     let(:provider) { double("provider", capture_screen: double("Bitmap")) }
 
     it "returns a bitmap" do
-      expect(screen.capture_screen).to be_a(Deskbot::Bitmap)
+      expect(screen.capture).to be_a(Deskbot::Bitmap)
     end
   end
 
-  describe "#capture_screen_area" do
+  describe "#capture_area" do
     let(:provider) { double("provider", capture_screen_area: double("Bitmap")) }
 
     it "returns a bitmap" do
-      expect(screen.capture_screen_area(x: 1, y: 1, width: 2, height: 2)).to be_a(Deskbot::Bitmap)
+      expect(screen.capture_area(x: 1, y: 1, width: 2, height: 2)).to be_a(Deskbot::Bitmap)
     end
   end
 end

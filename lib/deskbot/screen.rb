@@ -88,11 +88,11 @@ module Deskbot
       Color.new(red:, green:, blue:, alpha:)
     end
 
-    def screen_size
+    def size
       Size.new(@provider.screen_size)
     end
 
-    def screen_scale
+    def scale
       @provider.screen_scale
     end
 
@@ -112,12 +112,12 @@ module Deskbot
       )
     end
 
-    def capture_screen
+    def capture
       bitmap = @provider.capture_screen
       Deskbot::Bitmap.new(bitmap)
     end
 
-    def capture_screen_area(x:, y:, width:, height:) # rubocop:disable Naming/MethodParameterName
+    def capture_area(x:, y:, width:, height:) # rubocop:disable Naming/MethodParameterName
       bitmap = @provider.capture_screen_area(
         Types::Coercible::Float[x],
         Types::Coercible::Float[y],

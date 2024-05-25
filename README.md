@@ -114,8 +114,8 @@ attributes.
 You can query the size of the screen:
 
 ```ruby
-size = screen.screen_size
-scale = screen.screen_scale
+size = screen.size
+scale = screen.scale
 ```
 
 The size would be a `Deskbot::Size` with `width` and `height` attributes. The
@@ -134,10 +134,10 @@ You can capture your screen:
 
 ```ruby
 # We can capture the whole screen
-bitmap = screen.capture_screen
+bitmap = screen.capture
 
 # Or we can capture part of our screen
-bitmap = screen.capture_screen_portion(x: 100, y: 100, width: 400, height: 400)
+bitmap = screen.capture_area(x: 100, y: 100, width: 400, height: 400)
 ```
 
 This returns a `Deskbot::Bitmap` which you can use to find areas that match
