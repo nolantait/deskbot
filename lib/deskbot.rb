@@ -135,7 +135,7 @@ module Deskbot
     )
   end
 
-  def rect_visible?(x:, y:, width:, height:) # rubocop:disable Naming/MethodParameterName
+  def area_visible?(x:, y:, width:, height:) # rubocop:disable Naming/MethodParameterName
     _is_rect_visible(
       Types::Coercible::Float[x],
       Types::Coercible::Float[y],
