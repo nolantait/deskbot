@@ -4,3 +4,6 @@ require:
 inherit_gem:
   rubocop-inhouse:
     - config/default.yml
+
+AllCops:
+  TargetRubyVersion: 3.3

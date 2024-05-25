@@ -21,8 +21,8 @@ module Deskbot
     def self.from_hex(hex)
       red, green, blue, alpha = hex
         .match(/^#(..)(..)(..)(..)?$/)
-          .captures
-          .map do |hex_pair|
+        .captures
+        .map do |hex_pair|
           hex_pair&.hex
         end
 
