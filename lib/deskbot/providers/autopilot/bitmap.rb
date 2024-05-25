@@ -9,7 +9,7 @@ module Deskbot
         #
         # def bounds
         # def color_at
-        # def eql?
+        # def bitmap_eq
         # def find
         # def find_color
         # def all
