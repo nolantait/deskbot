@@ -15,7 +15,23 @@ module Deskbot
         "b" => :blue,
         "a" => :alpha
         # rubocop:enable Style/StringHashKeys
-      }.fetch(key)
+      }.fetch(key, key)
+    end
+
+    def self.from_hex(hex)
+      red, green, blue, alpha = hex
+        .match(/^#(..)(..)(..)(..)?$/)
+          .captures
+          .map do |hex_pair|
+          hex_pair&.hex
+        end
+
+      new(
+        red:,
+        green:,
+        blue:,
+        alpha: alpha || 255
+      )
     end
   end
 end

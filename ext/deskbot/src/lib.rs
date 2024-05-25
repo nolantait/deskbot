@@ -36,5 +36,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     bitmap.define_method("_bounds", method!(bitmap::Bitmap::bounds, 0))?;
     bitmap.define_method("_find", method!(bitmap::Bitmap::find, 2))?;
     bitmap.define_method("_all", method!(bitmap::Bitmap::all, 2))?;
+    bitmap.define_method("_count", method!(bitmap::Bitmap::count, 2))?;
+    bitmap.define_method("_find_color", method!(bitmap::Bitmap::find_color, 2))?;
     Ok(())
 }

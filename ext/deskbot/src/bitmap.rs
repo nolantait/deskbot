@@ -22,6 +22,16 @@ impl Bitmap {
         ])
     }
 
+    pub fn find_color(&self, color: [u8; 4], tolerance: Option<f64>) -> Option<HashMap<String, f64>> {
+        if let Some(found) = self.0.find_color(image::Rgba(color), tolerance, None, None) {
+            return Some(HashMap::from([
+                ("x".to_string(), found.x),
+                ("y".to_string(), found.y),
+            ]));
+        }
+        None
+    }
+
     pub fn find(&self, image_path: String, tolerance: Option<f64>) -> Option<HashMap<String, f64>> {
         if let Ok(image) = open(image_path) {
             let needle = autopilot::bitmap::Bitmap::new(image, None);
@@ -48,6 +58,14 @@ impl Bitmap {
             }
         }
         results
+    }
+
+    pub fn count(&self, image_path: String, tolerance: Option<f64>) -> u64 {
+        if let Ok(image) = open(image_path) {
+            let needle = autopilot::bitmap::Bitmap::new(image, None);
+            return self.0.count_of_bitmap(&needle, tolerance, None, None);
+        }
+        0
     }
 }
 

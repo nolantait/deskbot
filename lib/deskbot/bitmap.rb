@@ -6,12 +6,20 @@ module Deskbot
       Area.new(_bounds)
     end
 
-    def find(image_path)
-      Point.new(_find(image_path))
+    def find(image_path, tolerance: nil)
+      Point.new(_find(image_path, tolerance))
     end
 
-    def all(image_path)
-      _all(image_path).map { |point| Point.new(point) }
+    def find_color(color, tolerance: nil)
+      Point.new(_find_color(color, tolerance))
+    end
+
+    def all(image_path, tolerance: nil)
+      _all(image_path, tolerance).map { |point| Point.new(point) }
+    end
+
+    def count(image_path, tolerance: nil)
+      _count(image_path, tolerance)
     end
   end
 end
