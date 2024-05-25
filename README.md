@@ -105,7 +105,7 @@ You can query the color of a specific pixel:
 
 ```ruby
 # Get the color of a specific pixel at x: 100, y: 100
-color = screen.get_color(100, 100)
+color = screen.color_at(100, 100)
 ```
 
 This returns a `Deskbot::Color` object with `red`, `green`, `blue` and `alpha`
