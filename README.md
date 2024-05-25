@@ -160,11 +160,36 @@ bitmap.color_at(100, 100)
 
 Which returns a `Deskbot::Color`.
 
+### Comparing images
+
 You can compare images to your bitmap with a given tolerance (optional):
 
 ```ruby
 bitmap.find("images/test.jpg")
 bitmap.all("images/test.jpg", tolerance: 4.0)
+```
+
+`find` and `find_color` both return `Dry::Monad::Result` objects meaning you
+need to unwrap their values:
+
+```ruby
+result = bitmap.find("images/test.jpg")
+point = result.success
+```
+
+They are also wrapped with an optional matcher so you can use a much nicer
+syntax to grab their values:
+
+```ruby
+bitmap.find("images/test.jpg") do |on|
+  on.success do |point|
+    # Do something with the point, no need to call point.success
+  end
+
+  on.failure do
+    # Handle you error here
+  end
+end
 ```
 
 These return `Deskbot::Point` objects with `x` and `y` attributes.
