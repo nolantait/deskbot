@@ -31,8 +31,17 @@ module Deskbot
     def all(image_path, tolerance: nil)
       _all(
         Types::String[image_path],
-        Types::Float.optional(tolerance)
-      ).map { |point| Point.new(point) }
+        Types::Float.optional[tolerance]
+      )
+        .map { |point| Point.new(point) }
+    end
+
+    def all_color(color, tolerance: nil)
+      _all_color(
+        Rgba[color],
+        Types::Float.optional[tolerance]
+      )
+        .map { |point| Point.new(point) }
     end
 
     def count(image_path, tolerance: nil)

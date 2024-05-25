@@ -45,6 +45,17 @@ impl Bitmap {
         }
         None
     }
+    
+    pub fn all_color(&self, color: [u8; 4], tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
+        let mut results = vec![];
+        for found in self.0.find_every_color(image::Rgba(color), tolerance, None, None) {
+            results.push(HashMap::from([
+                ("x".to_string(), found.x),
+                ("y".to_string(), found.y),
+            ]));
+        }
+        results
+    }
 
     pub fn all(&self, image_path: String, tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
         let mut results = vec![];
