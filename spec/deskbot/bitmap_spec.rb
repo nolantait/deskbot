@@ -3,6 +3,15 @@
 RSpec.describe Deskbot::Bitmap do
   let(:bitmap) { described_class.new(provider) }
 
+  describe "#save" do
+    let(:provider) { double("provider", save: nil) }
+
+    it "saves the bitmap" do
+      expect(provider).to receive(:save).with("images/test.png")
+      bitmap.save("images/test.png")
+    end
+  end
+
   describe "#bounds" do
     let(:provider) do
       double(

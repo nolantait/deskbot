@@ -44,5 +44,6 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     bitmap.define_method("find_color", method!(bitmap::Bitmap::find_color, 2))?;
     bitmap.define_method("all_color", method!(bitmap::Bitmap::all_color, 2))?;
     bitmap.define_method("color_at", method!(bitmap::Bitmap::get_pixel, 2))?;
+    bitmap.define_method("save", method!(bitmap::Bitmap::save, 1))?;
     Ok(())
 }

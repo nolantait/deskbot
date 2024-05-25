@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "Ruby desktop automation"
   spec.homepage = "https://github.com/nolantait/desktbot"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.required_ruby_version = ">= 3.3"
   spec.required_rubygems_version = ">= 3.3.11"
 
   spec.metadata["homepage_uri"] = spec.homepage

@@ -1,14 +1,23 @@
 extern crate autopilot;
 
+use magnus::exception;
 use image::open;
 use std::collections::HashMap;
+use std::path::Path;
 
-#[magnus::wrap(class = "Deskbot::Bitmap")]
+#[magnus::wrap(class = "Deskbot::Providers::Autopilot::Bitmap")]
 pub struct Bitmap(autopilot::bitmap::Bitmap);
 
 impl Bitmap {
     fn new(bitmap: autopilot::bitmap::Bitmap) -> Self {
         Bitmap(bitmap)
+    }
+
+    pub fn save(&self, path: String) -> Result<bool, magnus::Error> {
+        match self.0.image.save(path) {
+            Ok(_) => Ok(true),
+            Err(_) => Err(magnus::Error::new(exception::runtime_error(), "Could not save the image")),
+        }
     }
 
     pub fn bounds(&self) -> HashMap<String, f64> {
@@ -44,17 +53,28 @@ impl Bitmap {
     }
 
     pub fn find(&self, image_path: String, tolerance: Option<f64>) -> Option<HashMap<String, f64>> {
-        if let Ok(image) = open(image_path) {
-            let needle = autopilot::bitmap::Bitmap::new(image, None);
+        let path = Path::new(&image_path);
 
-            if let Some(found) = self.0.find_bitmap(&needle, tolerance, None, None) {
-                return Some(HashMap::from([
-                    ("x".to_string(), found.x),
-                    ("y".to_string(), found.y),
-                ]));
+        match open(path) {
+            Ok(image) => {
+                let needle = autopilot::bitmap::Bitmap::new(image, None);
+                if let Some(found) = self.0.find_bitmap(
+                    &needle,
+                    tolerance,
+                    None,
+                    None
+                ) {
+                    return Some(HashMap::from([
+                        ("x".to_string(), found.x),
+                        ("y".to_string(), found.y),
+                    ]));
+                }
+                None
+            }
+            Err(error) => {
+                panic!("Error: {:?}", error);
             }
         }
-        None
     }
 
     pub fn all_color(&self, color: [u8; 4], tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {

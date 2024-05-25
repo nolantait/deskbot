@@ -17,6 +17,10 @@ module Deskbot
       @provider = provider
     end
 
+    def save(image_path)
+      @provider.save(Types::String[image_path])
+    end
+
     def bounds
       Area.new(@provider.bounds)
     end
