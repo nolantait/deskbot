@@ -21,27 +21,35 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
+To start you can require the gem in your script and initialize a screen:
+
+```ruby
+require "deskbot"
+
+screen = Deskbot.screen
+```
+
 ### Typing
 
 Type something on the keyboard
 
 ```ruby
 # Type SOMETHING at 60 words per minute
-Deskbot.type("something", flags: [:shift], wpm: 60.0, noise: 0.0)
+screen.type("something", flags: [:shift], wpm: 60.0, noise: 0.0)
 ```
 
 You can also tap a key:
 
 ```ruby
 # Tap shift + a after a 1 second delay
-Deskbot.tap_key("a", flags: [:shift], delay_ms: 1.0)
+screen.tap_key("a", flags: [:shift], delay_ms: 1.0)
 ```
 
 And even more primitively you can toggle a key:
 
 ```ruby
 # Press the "a" key down
-Deskbot.toggle_key("a", down: true)
+screen.toggle_key("a", down: true)
 ```
 
 ### Alerts
@@ -49,7 +57,7 @@ Deskbot.toggle_key("a", down: true)
 You can make alerts
 
 ```ruby
-Deskbot.alert("Hello")
+screen.alert("Hello")
 ```
 
 ### Mouse movement
@@ -58,37 +66,37 @@ You can teleport your mouse somewhere on the screen:
 
 ```ruby
 # Teleport the mouse to coordinates x: 100, y: 100
-Deskbot.move_mouse(100, 100)
+screen.move_mouse(100, 100)
 ```
 
 You can also move the mouse smoothly somewhere:
 
 ```ruby
 # Move the mouse smoothly to x: 100, y: 100 over 2 seconds
-Deskbot.smooth_move_mouse(100, 100, duration: 2)
+screen.smooth_move_mouse(100, 100, duration: 2)
 ```
 
 You can click:
 
 ```ruby
 # Left click
-Deskbot.click
+screen.click
 
 # Right click
-Deskbot.click(:right)
+screen.click(:right)
 ```
 
 Or even scroll:
 
 ```ruby
 # Scroll 1 click up
-Deskbot.scroll
+screen.scroll
 
 # Scroll 5 clicks up
-Deskbot.scroll(clicks: 5)
+screen.scroll(clicks: 5)
 
 # Scroll 5 clicks down
-Deskbot.scroll(:down, clicks: 5)
+screen.scroll(:down, clicks: 5)
 ```
 
 ### Screen introspection
@@ -97,7 +105,7 @@ You can query the color of a specific pixel:
 
 ```ruby
 # Get the color of a specific pixel at x: 100, y: 100
-color = Deskbot.get_color(100, 100)
+color = screen.get_color(100, 100)
 ```
 
 This returns a `Deskbot::Color` object with `red`, `green`, `blue` and `alpha`
@@ -106,8 +114,8 @@ attributes.
 You can query the size of the screen:
 
 ```ruby
-size = Deskbot.screen_size
-scale = Deskbot.screen_scale
+size = screen.screen_size
+scale = screen.screen_scale
 ```
 
 The size would be a `Deskbot::Size` with `width` and `height` attributes. The
@@ -116,8 +124,8 @@ scale would simply be a float.
 You can query if a point is visible on the screen:
 
 ```ruby
-Deskbot.point_visible?(100, 100)
-Deskbot.area_visible?(x: 100, y: 100, width: 400, height: 400)
+screen.point_visible?(100, 100)
+screen.area_visible?(x: 100, y: 100, width: 400, height: 400)
 ```
 
 ### Bitmaps
@@ -126,10 +134,10 @@ You can capture your screen:
 
 ```ruby
 # We can capture the whole screen
-bitmap = Deskbot.capture_screen
+bitmap = screen.capture_screen
 
 # Or we can capture part of our screen
-bitmap = Deskbot.capture_screen_portion(x: 100, y: 100, width: 400, height: 400)
+bitmap = screen.capture_screen_portion(x: 100, y: 100, width: 400, height: 400)
 ```
 
 This returns a `Deskbot::Bitmap` which you can use to find areas that match
