@@ -10,6 +10,7 @@ publish = false
 crate-type = ["cdylib"]
 
 [dependencies]
+opencv = { version = "0.91.3", features = ["clang-runtime"] }
 magnus = { version = "0.6.2" }
 autopilot = { version = "0.4.0" }
 image = { version = "0.22.4" }
