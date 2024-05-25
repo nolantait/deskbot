@@ -1,9 +1,18 @@
 extern crate autopilot;
 
-use magnus::exception;
 use image::open;
+use magnus::exception;
 use std::collections::HashMap;
 use std::path::Path;
+
+
+extern crate opencv;
+
+use opencv::{
+    core::{self, Mat},
+    imgproc,
+    Result,
+};
 
 #[magnus::wrap(class = "Deskbot::Providers::Autopilot::Bitmap")]
 pub struct Bitmap(autopilot::bitmap::Bitmap);
@@ -16,7 +25,10 @@ impl Bitmap {
     pub fn save(&self, path: String) -> Result<bool, magnus::Error> {
         match self.0.image.save(path) {
             Ok(_) => Ok(true),
-            Err(_) => Err(magnus::Error::new(exception::runtime_error(), "Could not save the image")),
+            Err(_) => Err(magnus::Error::new(
+                exception::runtime_error(),
+                "Could not save the image",
+            )),
         }
     }
 
@@ -53,28 +65,58 @@ impl Bitmap {
     }
 
     pub fn find(&self, image_path: String, tolerance: Option<f64>) -> Option<HashMap<String, f64>> {
-        let path = Path::new(&image_path);
+        let src = match opencv::imgcodecs::imread("./tmp/last-screenshot.png", opencv::imgcodecs::IMREAD_COLOR) {
+            Ok(src) => src,
+            Err(error) => panic!("Could not read the image: {}", error),
+        };
+        let templ = match opencv::imgcodecs::imread(&image_path, opencv::imgcodecs::IMREAD_COLOR) {
+            Ok(templ) => templ,
+            Err(error) => panic!("Could not read the image: {}", error),
+        };
 
-        match open(path) {
-            Ok(image) => {
-                let needle = autopilot::bitmap::Bitmap::new(image, None);
-                if let Some(found) = self.0.find_bitmap(
-                    &needle,
-                    tolerance,
-                    None,
-                    None
-                ) {
-                    return Some(HashMap::from([
-                        ("x".to_string(), found.x),
-                        ("y".to_string(), found.y),
-                    ]));
-                }
-                None
-            }
-            Err(error) => {
-                panic!("Error: {:?}", error);
-            }
+        // Create Mat for the result
+        let mut dst = Mat::default();
+        let mask = Mat::default();
+
+        // Perform template matching
+        match imgproc::match_template(
+            &src,
+            &templ,
+            &mut dst,
+            imgproc::TemplateMatchModes::TM_SQDIFF_NORMED.into(),
+            &mask,
+        ) {
+            Ok(_) => {},
+            Err(error) => panic!("Could not match the template: {}", error),
         }
+
+        // Find the location of the best match
+        let (mut min_val, mut max_val) = (0.0, 0.0);
+        let mut min_point = core::Point { x: 0, y: 0 };
+        let mut max_point = core::Point { x: 0, y: 0 };
+
+        match core::min_max_loc(
+            &dst,
+            Some(&mut min_val),
+            Some(&mut max_val),
+            Some(&mut min_point),
+            Some(&mut max_point),
+            &mask,
+        ) {
+            Ok(_) => {},
+            Err(error) => panic!("Could not find the min max loc: {}", error),
+        }
+
+        if min_val > tolerance.unwrap_or(0.0) {
+            return None;
+        }
+
+        Some(
+            HashMap::from([
+                ("x".to_string(), min_point.x as f64),
+                ("y".to_string(), min_point.y as f64),
+            ])
+        )
     }
 
     pub fn all_color(&self, color: [u8; 4], tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
@@ -121,7 +163,10 @@ pub fn capture_screen_portion(x: f64, y: f64, width: f64, height: f64) -> Option
     let image = autopilot::bitmap::capture_screen_portion(rect);
 
     match image {
-        Ok(image) => Some(Bitmap::new(image)),
+        Ok(image) => {
+            image.image.save("./tmp/last-screenshot.png").unwrap();
+            Some(Bitmap::new(image))
+        },
         Err(_) => None,
     }
 }
@@ -130,7 +175,10 @@ pub fn capture_screen() -> Option<Bitmap> {
     let image = autopilot::bitmap::capture_screen();
 
     match image {
-        Ok(image) => Some(Bitmap::new(image)),
+        Ok(image) => {
+            image.image.save("./tmp/last-screenshot.png").unwrap();
+            Some(Bitmap::new(image))
+        },
         Err(_) => None,
     }
 }
