@@ -9,6 +9,11 @@ This library uses [dry-types](https://dry-rb.org/gems/dry-types/1.7/) so the
 arguments should be well documented in
 the `lib/deskbot/screen.rb` and `lib/deskbot/bitmap.rb` files
 
+The default implementation of finding images with autopilot was unbearably slow,
+so I've rewritten matching templates to use
+[opencv](https://github.com/twistedfall/opencv-rust). So ensure you have opencv
+[installed](https://github.com/twistedfall/opencv-rust/blob/master/INSTALL.md).
+
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
