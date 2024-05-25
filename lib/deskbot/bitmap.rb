@@ -10,7 +10,7 @@ module Deskbot
       Area.new(_bounds)
     end
 
-    def get_color(x, y) # rubocop:disable Naming/MethodParameterName
+    def color_at(x, y) # rubocop:disable Naming/MethodParameterName
       red, green, blue, alpha = _get_pixel(x, y)
       Color.new(red:, green:, blue:, alpha:)
     end
