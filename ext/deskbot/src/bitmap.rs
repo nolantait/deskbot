@@ -22,7 +22,18 @@ impl Bitmap {
         ])
     }
 
-    pub fn find_color(&self, color: [u8; 4], tolerance: Option<f64>) -> Option<HashMap<String, f64>> {
+    pub fn get_pixel(&self, x: f64, y: f64) -> Vec<u8> {
+        let point = autopilot::geometry::Point::new(x, y);
+        let value = self.0.get_pixel(point).0;
+        // For some reason I have to convert to a Vec<u8>. Magnus doesn't like [u8; 4]
+        return value.to_vec();
+    }
+
+    pub fn find_color(
+        &self,
+        color: [u8; 4],
+        tolerance: Option<f64>,
+    ) -> Option<HashMap<String, f64>> {
         if let Some(found) = self.0.find_color(image::Rgba(color), tolerance, None, None) {
             return Some(HashMap::from([
                 ("x".to_string(), found.x),
@@ -45,10 +56,13 @@ impl Bitmap {
         }
         None
     }
-    
+
     pub fn all_color(&self, color: [u8; 4], tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
         let mut results = vec![];
-        for found in self.0.find_every_color(image::Rgba(color), tolerance, None, None) {
+        for found in self
+            .0
+            .find_every_color(image::Rgba(color), tolerance, None, None)
+        {
             results.push(HashMap::from([
                 ("x".to_string(), found.x),
                 ("y".to_string(), found.y),
