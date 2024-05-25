@@ -5,6 +5,7 @@ mod bitmap;
 mod keys;
 mod mouse;
 mod screen;
+mod alert;
 
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -25,6 +26,8 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_singleton_method("_screen_scale", function!(screen::scale, 0))?;
     module.define_singleton_method("_is_point_visible", function!(screen::is_point_visible, 2))?;
     module.define_singleton_method("_is_rect_visible", function!(screen::is_rect_visible, 4))?;
+
+    module.define_singleton_method("_alert", function!(alert::alert, 1))?;
 
     module.define_singleton_method(
         "_capture_screen_portion",

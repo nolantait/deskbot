@@ -15,6 +15,13 @@ module Deskbot
       Color.new(red:, green:, blue:, alpha:)
     end
 
+    def eql?(image_path, tolerance: nil)
+      _bitmap_eq(
+        Types::String[image_path],
+        Types::Float.optional[tolerance]
+      )
+    end
+
     def find(image_path, tolerance: nil)
       Point.new(
         _find(
@@ -50,7 +57,10 @@ module Deskbot
     end
 
     def count(image_path, tolerance: nil)
-      _count(image_path, tolerance)
+      _count(
+        Types::String[image_path],
+        Types::Float.optional[tolerance]
+      )
     end
   end
 end

@@ -40,6 +40,10 @@ module Deskbot
     "down"
   )
 
+  def alert(message)
+    _alert(Types::String[message])
+  end
+
   def type(text, flags: [], wpm: 60.0, noise: 0.0)
     _type_string(
       Types::String[text],
