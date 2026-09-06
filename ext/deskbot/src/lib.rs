@@ -1,4 +1,4 @@
-use magnus::{class, function, method, prelude::*, Error, Ruby};
+use magnus::{function, method, prelude::*, Error, Ruby};
 extern crate autopilot;
 
 mod bitmap;
@@ -36,7 +36,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     )?;
     module.define_singleton_method("capture_screen", function!(bitmap::capture_screen, 0))?;
 
-    let bitmap = module.define_class("Bitmap", class::object())?;
+    let bitmap = module.define_class("Bitmap", ruby.class_object())?;
     bitmap.define_method("bounds", method!(bitmap::Bitmap::bounds, 0))?;
     bitmap.define_method("find", method!(bitmap::Bitmap::find, 2))?;
     bitmap.define_method("all", method!(bitmap::Bitmap::all, 2))?;

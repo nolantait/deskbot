@@ -1,7 +1,7 @@
 extern crate autopilot;
 
 use image::open;
-use magnus::exception;
+use magnus::{Error, Ruby};
 use std::collections::HashMap;
 
 extern crate opencv;
@@ -22,8 +22,8 @@ impl Bitmap {
     pub fn save(&self, path: String) -> Result<bool, magnus::Error> {
         match self.0.image.save(path) {
             Ok(_) => Ok(true),
-            Err(_) => Err(magnus::Error::new(
-                exception::runtime_error(),
+            Err(_) => Err(Error::new(
+                Ruby::get().unwrap().exception_runtime_error(),
                 "Could not save the image",
             )),
         }
