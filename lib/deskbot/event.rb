@@ -1,60 +1,118 @@
 # frozen_string_literal: true
 
 module Deskbot
-  # A single device event (key/mouse down, key/mouse up, or mouse move) yielded
-  # by {Screen#listen}. Events are discriminated by their `type` and only the
-  # fields relevant to that type are populated.
+  # Base class for the distinct device events yielded by {Screen#listen}.
   #
-  # @example
+  # Listening yields an instance of one of the concrete subclasses, each of
+  # which exposes only the fields relevant to it:
+  #
+  # - {Event::KeyDown} / {Event::KeyUp} - expose `key`
+  # - {Event::MouseDown} / {Event::MouseUp} - expose `button`
+  # - {Event::MouseMove} - exposes `x`, `y` and `coords`
+  #
+  # Dispatch on the event's class rather than on a `type` value:
+  #
   #   Deskbot.screen.listen do |event|
-  #     case event.type
-  #     when :mouse_move then puts "moved to #{event.x}, #{event.y}"
-  #     when :key_down   then puts "pressed #{event.key}"
-  #     when :mouse_up   then puts "released #{event.button}"
+  #     case event
+  #     when Deskbot::Event::KeyDown   then puts "pressed #{event.key}"
+  #     when Deskbot::Event::KeyUp     then puts "released #{event.key}"
+  #     when Deskbot::Event::MouseDown then puts "button down: #{event.button}"
+  #     when Deskbot::Event::MouseUp   then puts "button up: #{event.button}"
+  #     when Deskbot::Event::MouseMove then puts event.coords.inspect
   #     end
   #   end
+  #
+  # Base `Event` is abstract and is never instantiated directly; use
+  # {Event.build} to turn a native payload into the matching subclass.
   class Event
-    EVENT_TYPES = %i[key_down key_up mouse_down mouse_up mouse_move].freeze
-
-    attr_reader :type, :key, :button, :x, :y
-
-    def initialize(type:, key: nil, button: nil, x: nil, y: nil) # rubocop:disable Naming/MethodParameterName
-      @type = Types::EventType[type]
-      @key = key&.to_sym
-      @button = button
-      @x = x
-      @y = y
-    end
-
-    # Builds an event from the raw hash yielded by the native listener.
+    # Builds the concrete event described by the raw hash yielded by the native
+    # listener.
     def self.build(payload)
-      new(
-        type: payload["type"],
-        key: payload["key"],
-        button: payload["button"],
-        x: payload["x"],
-        y: payload["y"]
-      )
+      subclass = {
+        "key_down" => Event::KeyDown,
+        "key_up" => Event::KeyUp,
+        "mouse_down" => Event::MouseDown,
+        "mouse_up" => Event::MouseUp,
+        "mouse_move" => Event::MouseMove
+      }[payload["type"]]
+
+      unless subclass
+        raise ArgumentError,
+          "unknown event type: #{payload["type"].inspect}"
+      end
+
+      subclass.build(payload)
     end
 
-    def coords
-      [x, y] if x && y
+    # A key was pressed down. Exposes the pressed {#key}.
+    class KeyDown < Event
+      attr_reader :key
+
+      def initialize(key:)
+        @key = key.to_sym
+      end
+
+      def self.build(payload)
+        new(key: payload["key"])
+      end
     end
 
-    def key_event?
-      %i[key_down key_up].include?(type)
+    # A key was released. Exposes the released {#key}.
+    class KeyUp < Event
+      attr_reader :key
+
+      def initialize(key:)
+        @key = key.to_sym
+      end
+
+      def self.build(payload)
+        new(key: payload["key"])
+      end
     end
 
-    def mouse_event?
-      %i[mouse_down mouse_up mouse_move].include?(type)
+    # A mouse button was pressed down. Exposes the pressed {#button}.
+    class MouseDown < Event
+      attr_reader :button
+
+      def initialize(button:)
+        @button = button
+      end
+
+      def self.build(payload)
+        new(button: payload["button"])
+      end
     end
 
-    def move?
-      type == :mouse_move
+    # A mouse button was released. Exposes the released {#button}.
+    class MouseUp < Event
+      attr_reader :button
+
+      def initialize(button:)
+        @button = button
+      end
+
+      def self.build(payload)
+        new(button: payload["button"])
+      end
     end
 
-    def to_h
-      { type:, key:, button:, x:, y: }
+    # The mouse moved to a new position. Exposes {#x}, {#y} and {#coords}.
+    class MouseMove < Event
+      attr_reader :x, :y
+
+      def initialize(x:, y:) # rubocop:disable Naming/MethodParameterName
+        @x = x
+        @y = y
+      end
+
+      def self.build(payload)
+        new(x: payload["x"], y: payload["y"])
+      end
+
+      # Returns the mouse position as `[x, y]`.
+      def coords
+        [x, y]
+      end
     end
   end
 end

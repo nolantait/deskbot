@@ -164,13 +164,13 @@ RSpec.describe Deskbot::Screen do
 
     let(:provider) { provider_class.new }
 
-    it "yields typed events to the block" do
+    it "yields concrete events to the block" do
       events = []
       screen.listen { |event| events << event }
 
-      expect(events.map(&:type)).to eq(%i[mouse_move key_down])
-      expect(events.first).to be_a(Deskbot::Event)
+      expect(events.first).to be_a(Deskbot::Event::MouseMove)
       expect(events.first.coords).to eq([5, 7])
+      expect(events.last).to be_a(Deskbot::Event::KeyDown)
       expect(events.last.key).to eq(:space)
     end
 

@@ -221,25 +221,34 @@ These will return `Deskbot::Point` objects with `x` and `y` attributes.
 ### Listening for device events
 
 You can record device events (key presses, mouse button presses and mouse
-movements) with a blocking `listen` loop. Each event is yielded to the block
-as a `Deskbot::Event`, discriminated by `type`:
+movements) with a blocking `listen` loop. Each event is yielded:
+
+- `Deskbot::Event::KeyDown`,
+- `Deskbot::Event::KeyUp`
+- `Deskbot::Event::MouseDown`
+- `Deskbot::Event::MouseUp`
+- `Deskbot::Event::MouseMove`
 
 ```ruby
 Deskbot.screen.listen do |event|
-  case event.type
-  when :mouse_move
+  case event
+  when Deskbot::Event::MouseMove
     puts "mouse moved to #{event.x}, #{event.y}"
-  when :key_down
+  when Deskbot::Event::KeyDown
     puts "key down: #{event.key}"
-  when :key_up
+  when Deskbot::Event::KeyUp
     puts "key up: #{event.key}"
-  when :mouse_down
+  when Deskbot::Event::MouseDown
     puts "button down: #{event.button}"
-  when :mouse_up
+  when Deskbot::Event::MouseUp
     puts "button up: #{event.button}"
   end
 end
 ```
+
+Each event exposes only the fields relevant to it: key events have `key`, mouse
+button events have `button`, and mouse movement events have `x`, `y` and
+`coords`.
 
 `listen` blocks the calling thread. Raising inside the block stops listening.
 

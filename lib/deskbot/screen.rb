@@ -129,7 +129,8 @@ module Deskbot
     end
 
     # Blocks listening for device events (key down/up, mouse down/up/move),
-    # yielding each {Event} to the block. Raises to stop listening.
+    # yielding each concrete event (a subclass of {Event}) to the block. Raises
+    # to stop listening.
     def listen
       raise ArgumentError, "a block is required" unless block_given?
 
