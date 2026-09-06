@@ -2,7 +2,7 @@ use std::sync::{
     mpsc::{self, Receiver, Sender},
     Arc, Mutex, OnceLock,
 };
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use device_query::{
     DeviceEvents, DeviceEventsHandler, Keycode, MouseButton, MousePosition,
@@ -17,6 +17,19 @@ enum RawEvent {
     MouseDown(usize),
     MouseUp(usize),
     MouseMove(i64, i64),
+}
+
+/// A buffered event along with the wall-clock time (seconds since the Unix
+/// epoch, as a float) at which it was captured by `device_query`.
+type BufferedEvent = (f64, RawEvent);
+
+/// Returns the current wall-clock time in seconds (with fractional precision)
+/// since the Unix epoch.
+fn now() -> f64 {
+    let duration = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("system clock is set before the Unix epoch");
+    duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) / 1_000_000_000.0
 }
 
 /// `device_query` only allows a single event loop to be initialised for the
@@ -61,8 +74,10 @@ fn keycode_to_name(keycode: Keycode) -> String {
 }
 
 /// Turns a buffered event into a Ruby `Hash` describing it.
-fn event_to_ruby(ruby: &Ruby, event: RawEvent) -> Result<RHash, Error> {
+fn event_to_ruby(ruby: &Ruby, event: BufferedEvent) -> Result<RHash, Error> {
+    let (recorded_at, event) = event;
     let hash = ruby.hash_new();
+    hash.aset("recorded_at", recorded_at)?;
 
     match event {
         RawEvent::KeyDown(key) => {
@@ -97,7 +112,7 @@ fn event_to_ruby(ruby: &Ruby, event: RawEvent) -> Result<RHash, Error> {
 #[allow(clippy::type_complexity)]
 fn register_callbacks(
     handler: &DeviceEventsHandler,
-    sender: &Sender<RawEvent>,
+    sender: &Sender<BufferedEvent>,
 ) -> (
     device_query::CallbackGuard<impl Fn(&Keycode) + Send + Sync + 'static>,
     device_query::CallbackGuard<impl Fn(&Keycode) + Send + Sync + 'static>,
@@ -109,36 +124,39 @@ fn register_callbacks(
 
     let key_down_sender = Arc::clone(&sender);
     let key_down = handler.on_key_down(move |key: &Keycode| {
-        let _ = key_down_sender
-            .lock()
-            .map(|sender| sender.send(RawEvent::KeyDown(keycode_to_name(*key))));
+        let _ = key_down_sender.lock().map(|sender| {
+            sender.send((now(), RawEvent::KeyDown(keycode_to_name(*key))))
+        });
     });
 
     let key_up_sender = Arc::clone(&sender);
     let key_up = handler.on_key_up(move |key: &Keycode| {
-        let _ = key_up_sender
-            .lock()
-            .map(|sender| sender.send(RawEvent::KeyUp(keycode_to_name(*key))));
+        let _ = key_up_sender.lock().map(|sender| {
+            sender.send((now(), RawEvent::KeyUp(keycode_to_name(*key))))
+        });
     });
 
     let mouse_down_sender = Arc::clone(&sender);
     let mouse_down = handler.on_mouse_down(move |button: &MouseButton| {
         let _ = mouse_down_sender
             .lock()
-            .map(|sender| sender.send(RawEvent::MouseDown(*button)));
+            .map(|sender| sender.send((now(), RawEvent::MouseDown(*button))));
     });
 
     let mouse_up_sender = Arc::clone(&sender);
     let mouse_up = handler.on_mouse_up(move |button: &MouseButton| {
         let _ = mouse_up_sender
             .lock()
-            .map(|sender| sender.send(RawEvent::MouseUp(*button)));
+            .map(|sender| sender.send((now(), RawEvent::MouseUp(*button))));
     });
 
     let mouse_move_sender = Arc::clone(&sender);
     let mouse_move = handler.on_mouse_move(move |position: &MousePosition| {
         let _ = mouse_move_sender.lock().map(|sender| {
-            sender.send(RawEvent::MouseMove(position.0 as i64, position.1 as i64))
+            sender.send((
+                now(),
+                RawEvent::MouseMove(position.0 as i64, position.1 as i64),
+            ))
         });
     });
 
@@ -158,7 +176,7 @@ pub fn listen(ruby: &Ruby) -> Result<(), Error> {
     let handler = handler().map_err(|message| {
         Error::new(ruby.exception_arg_error(), message)
     })?;
-    let (sender, receiver): (Sender<RawEvent>, Receiver<RawEvent>) = mpsc::channel();
+    let (sender, receiver): (Sender<BufferedEvent>, Receiver<BufferedEvent>) = mpsc::channel();
 
     let (_key_down, _key_up, _mouse_down, _mouse_up, _mouse_move) =
         register_callbacks(handler, &sender);

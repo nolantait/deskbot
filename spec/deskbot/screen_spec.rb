@@ -156,8 +156,8 @@ RSpec.describe Deskbot::Screen do
     let(:provider_class) do
       Class.new do
         def listen
-          yield("type" => "mouse_move", "x" => 5, "y" => 7)
-          yield("type" => "key_down", "key" => "space")
+          yield("type" => "mouse_move", "x" => 5, "y" => 7, "recorded_at" => 1_700_000_000.5)
+          yield("type" => "key_down", "key" => "space", "recorded_at" => 1_700_000_001.25)
         end
       end
     end
@@ -170,8 +170,10 @@ RSpec.describe Deskbot::Screen do
 
       expect(events.first).to be_a(Deskbot::Event::MouseMove)
       expect(events.first.coords).to eq([5, 7])
+      expect(events.first.recorded_at).to eq(Time.at(1_700_000_000.5))
       expect(events.last).to be_a(Deskbot::Event::KeyDown)
       expect(events.last.key).to eq(:space)
+      expect(events.last.recorded_at).to eq(Time.at(1_700_000_001.25))
     end
 
     it "requires a block" do

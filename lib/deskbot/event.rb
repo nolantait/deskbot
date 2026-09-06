@@ -25,6 +25,9 @@ module Deskbot
   # Base `Event` is abstract and is never instantiated directly; use
   # {Event.build} to turn a native payload into the matching subclass.
   class Event
+    # The time the event was recorded. Every concrete event exposes it.
+    attr_reader :recorded_at
+
     # Builds the concrete event described by the raw hash yielded by the native
     # listener.
     def self.build(payload)
@@ -44,16 +47,22 @@ module Deskbot
       subclass.build(payload)
     end
 
+    # Builds the recorded-at `Time` for an event from its native payload.
+    def self.recorded_at_from(payload)
+      Time.at(payload["recorded_at"])
+    end
+
     # A key was pressed down. Exposes the pressed {#key}.
     class KeyDown < Event
       attr_reader :key
 
-      def initialize(key:)
+      def initialize(key:, recorded_at:)
         @key = key.to_sym
+        @recorded_at = recorded_at
       end
 
       def self.build(payload)
-        new(key: payload["key"])
+        new(key: payload["key"], recorded_at: recorded_at_from(payload))
       end
     end
 
@@ -61,12 +70,13 @@ module Deskbot
     class KeyUp < Event
       attr_reader :key
 
-      def initialize(key:)
+      def initialize(key:, recorded_at:)
         @key = key.to_sym
+        @recorded_at = recorded_at
       end
 
       def self.build(payload)
-        new(key: payload["key"])
+        new(key: payload["key"], recorded_at: recorded_at_from(payload))
       end
     end
 
@@ -74,12 +84,13 @@ module Deskbot
     class MouseDown < Event
       attr_reader :button
 
-      def initialize(button:)
+      def initialize(button:, recorded_at:)
         @button = button
+        @recorded_at = recorded_at
       end
 
       def self.build(payload)
-        new(button: payload["button"])
+        new(button: payload["button"], recorded_at: recorded_at_from(payload))
       end
     end
 
@@ -87,12 +98,13 @@ module Deskbot
     class MouseUp < Event
       attr_reader :button
 
-      def initialize(button:)
+      def initialize(button:, recorded_at:)
         @button = button
+        @recorded_at = recorded_at
       end
 
       def self.build(payload)
-        new(button: payload["button"])
+        new(button: payload["button"], recorded_at: recorded_at_from(payload))
       end
     end
 
@@ -100,13 +112,18 @@ module Deskbot
     class MouseMove < Event
       attr_reader :x, :y
 
-      def initialize(x:, y:) # rubocop:disable Naming/MethodParameterName
+      def initialize(x:, y:, recorded_at:) # rubocop:disable Naming/MethodParameterName
         @x = x
         @y = y
+        @recorded_at = recorded_at
       end
 
       def self.build(payload)
-        new(x: payload["x"], y: payload["y"])
+        new(
+          x: payload["x"],
+          y: payload["y"],
+          recorded_at: recorded_at_from(payload)
+        )
       end
 
       # Returns the mouse position as `[x, y]`.
