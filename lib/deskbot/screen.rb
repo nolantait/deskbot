@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Deskbot
-  class Screen
+  class Screen # rubocop:disable Metrics/ClassLength
     # This is the API for any provider
 
     def initialize(provider)
@@ -126,6 +126,16 @@ module Deskbot
       )
 
       Deskbot::Bitmap.new(bitmap)
+    end
+
+    # Blocks listening for device events (key down/up, mouse down/up/move),
+    # yielding each {Event} to the block. Raises to stop listening.
+    def listen
+      raise ArgumentError, "a block is required" unless block_given?
+
+      @provider.listen do |payload|
+        yield Event.build(payload)
+      end
     end
   end
 end

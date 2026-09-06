@@ -13,4 +13,5 @@ crate-type = ["cdylib"]
 opencv = { version = "0.100", features = ["clang-runtime"] }
 magnus = { version = "0.8" }
 autopilot = { version = "0.4" }
+device_query = "4.0"
 image = { version = "0.22" }

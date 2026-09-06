@@ -26,5 +26,13 @@ module Deskbot
       "up",
       "down"
     )
+
+    EventType = Types::Coercible::Symbol.enum(
+      :key_down,
+      :key_up,
+      :mouse_down,
+      :mouse_up,
+      :mouse_move
+    )
   end
 end

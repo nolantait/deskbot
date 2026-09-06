@@ -151,4 +151,32 @@ RSpec.describe Deskbot::Screen do
       expect(screen.capture_area(x: 1, y: 1, width: 2, height: 2)).to be_a(Deskbot::Bitmap)
     end
   end
+
+  describe "#listen" do
+    let(:provider_class) do
+      Class.new do
+        def listen
+          yield("type" => "mouse_move", "x" => 5, "y" => 7)
+          yield("type" => "key_down", "key" => "space")
+        end
+      end
+    end
+
+    let(:provider) { provider_class.new }
+
+    it "yields typed events to the block" do
+      events = []
+      screen.listen { |event| events << event }
+
+      expect(events.map(&:type)).to eq(%i[mouse_move key_down])
+      expect(events.first).to be_a(Deskbot::Event)
+      expect(events.first.coords).to eq([5, 7])
+      expect(events.last.key).to eq(:space)
+    end
+
+    it "requires a block" do
+      expect { screen.listen }
+        .to raise_error(ArgumentError)
+    end
+  end
 end

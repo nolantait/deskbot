@@ -21,6 +21,7 @@ module Deskbot
       # def screen_scale
       # def is_point_visible
       # def is_area_visible
+      # def listen
       # def capture_screen
       # def capture_screen_portion
     end

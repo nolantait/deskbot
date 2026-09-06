@@ -1,11 +1,12 @@
 use magnus::{function, method, prelude::*, Error, Ruby};
 extern crate autopilot;
 
+mod alert;
 mod bitmap;
 mod keys;
+mod listen;
 mod mouse;
 mod screen;
-mod alert;
 
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -27,6 +28,8 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_singleton_method("screen_scale", function!(screen::scale, 0))?;
     module.define_singleton_method("is_point_visible", function!(screen::is_point_visible, 2))?;
     module.define_singleton_method("is_area_visible", function!(screen::is_rect_visible, 4))?;
+
+    module.define_singleton_method("listen", function!(listen::listen, 0))?;
 
     module.define_singleton_method("alert", function!(alert::alert, 1))?;
 

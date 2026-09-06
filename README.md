@@ -218,6 +218,31 @@ bitmap.all_color([255, 255, 255, 0])
 
 These will return `Deskbot::Point` objects with `x` and `y` attributes.
 
+### Listening for device events
+
+You can record device events (key presses, mouse button presses and mouse
+movements) with a blocking `listen` loop. Each event is yielded to the block
+as a `Deskbot::Event`, discriminated by `type`:
+
+```ruby
+Deskbot.screen.listen do |event|
+  case event.type
+  when :mouse_move
+    puts "mouse moved to #{event.x}, #{event.y}"
+  when :key_down
+    puts "key down: #{event.key}"
+  when :key_up
+    puts "key up: #{event.key}"
+  when :mouse_down
+    puts "button down: #{event.button}"
+  when :mouse_up
+    puts "button up: #{event.button}"
+  end
+end
+```
+
+`listen` blocks the calling thread. Raising inside the block stops listening.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies.

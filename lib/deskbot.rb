@@ -12,6 +12,7 @@ require_relative "deskbot/point"
 require_relative "deskbot/color"
 require_relative "deskbot/size"
 require_relative "deskbot/area"
+require_relative "deskbot/event"
 require_relative "deskbot/bitmap"
 
 require "deskbot/providers/autopilot/bitmap"
