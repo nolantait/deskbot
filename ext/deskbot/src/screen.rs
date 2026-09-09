@@ -1,11 +1,15 @@
 extern crate autopilot;
 use std::collections::HashMap;
 
-pub fn get_color(x: f64, y: f64) -> Option<Vec<u8>> {
-    let color = autopilot::screen::get_color(autopilot::geometry::Point::new(x, y));
-    match color {
-        Ok(color) => Some(color.0.to_vec()),
-        Err(_) => None
+pub fn get_color(x: f64, y: f64) -> Vec<u8> {
+    let point = autopilot::geometry::Point::new(x, y);
+    // autopilot::screen::get_color grabs a 1x1 (single point) region. On some
+    // X servers that truncates to a 0px capture and autopilot segfaults while
+    // destroying the resulting (null) image. Capture the whole (reliable)
+    // screen instead and read the pixel, mirroring how screen.capture works.
+    match autopilot::bitmap::capture_screen() {
+        Ok(bitmap) => bitmap.get_pixel(point).0.to_vec(),
+        Err(_) => vec![0, 0, 0, 255]
     }
 }
 
