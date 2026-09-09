@@ -3,6 +3,11 @@ extern crate autopilot;
 use image::open;
 use magnus::{Error, Ruby};
 use std::collections::HashMap;
+use std::path::PathBuf;
+
+fn last_screenshot_path() -> PathBuf {
+    std::env::temp_dir().join("deskbot-last-screenshot.png")
+}
 
 extern crate opencv;
 
@@ -63,7 +68,7 @@ impl Bitmap {
 
     pub fn find(&self, image_path: String, tolerance: Option<f64>) -> Option<HashMap<String, f64>> {
         let src = match opencv::imgcodecs::imread(
-            "./tmp/last-screenshot.png",
+            last_screenshot_path(),
             opencv::imgcodecs::IMREAD_COLOR,
         ) {
             Ok(src) => src,
@@ -134,7 +139,7 @@ impl Bitmap {
     pub fn all(&self, image_path: String, tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
         let mut results = vec![];
 
-        let mut image = self.load_image("./tmp/last-screenshot.png");
+        let mut image = self.load_image(last_screenshot_path());
         let template_image = self.load_image(&image_path);
         let mut matches: Vec<core::Point> = Vec::new();
 
@@ -189,7 +194,7 @@ impl Bitmap {
         (min_point, min_val)
     }
 
-    fn load_image(&self, path: &str) -> Mat {
+    fn load_image(&self, path: impl AsRef<std::ffi::OsStr>) -> Mat {
         match opencv::imgcodecs::imread(path, opencv::imgcodecs::IMREAD_COLOR) {
             Ok(src) => src,
             Err(error) => panic!("Could not read the image: {}", error),
@@ -248,7 +253,7 @@ pub fn capture_screen_portion(x: f64, y: f64, width: f64, height: f64) -> Option
 
     match image {
         Ok(image) => {
-            image.image.save("./tmp/last-screenshot.png").unwrap();
+            image.image.save(&last_screenshot_path()).unwrap();
             Some(Bitmap::new(image))
         }
         Err(_) => None,
@@ -260,7 +265,7 @@ pub fn capture_screen() -> Option<Bitmap> {
 
     match image {
         Ok(image) => {
-            image.image.save("./tmp/last-screenshot.png").unwrap();
+            image.image.save(&last_screenshot_path()).unwrap();
             Some(Bitmap::new(image))
         }
         Err(_) => None,
