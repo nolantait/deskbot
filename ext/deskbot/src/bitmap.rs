@@ -1,6 +1,6 @@
 extern crate autopilot;
 
-use image::open;
+use image::{open, GenericImageView};
 use magnus::{Error, Ruby};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -20,6 +20,8 @@ use opencv::{
 pub struct Bitmap(autopilot::bitmap::Bitmap);
 
 impl Bitmap {
+    const MAX_COLOR_DELTA: f64 = 441.672_955_930_1; // => (3.0f64 * 255.0f64 * 255.0f64).sqrt();
+
     fn new(bitmap: autopilot::bitmap::Bitmap) -> Self {
         Bitmap(bitmap)
     }
@@ -123,17 +125,46 @@ impl Bitmap {
     }
 
     pub fn all_color(&self, color: [u8; 4], tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
+        // autopilot's find_every_color iterates scaled pixel coordinates and
+        // reads out of bounds on scaled displays (see screen.rs for a similar
+        // autopilot bug). Scan the captured pixels directly instead.
+        //
+        // The image is captured at physical resolution, so the raw scan
+        // indices are pixels. Convert them to the bitmap's point (logical)
+        // coordinate space by dividing by the bitmap's scale, so a
+        // found color can be fed straight to move_mouse (after offsetting by
+        // the capture-region origin). This keeps all_color consistent with
+        // find_color / find, which autopilot already returns as points.
+        let scale = self.0.scale;
+        let scale = if scale > 0.0 { scale } else { 1.0 };
         let mut results = vec![];
-        for found in self
-            .0
-            .find_every_color(image::Rgba(color), tolerance, None, None)
-        {
-            results.push(HashMap::from([
-                ("x".to_string(), found.x),
-                ("y".to_string(), found.y),
-            ]));
+        for y in 0..self.0.image.height() {
+            for x in 0..self.0.image.width() {
+                if Self::color_matches(color, self.0.image.get_pixel(x, y), tolerance) {
+                    results.push(HashMap::from([
+                        ("x".to_string(), x as f64 / scale),
+                        ("y".to_string(), y as f64 / scale),
+                    ]));
+                }
+            }
         }
         results
+    }
+
+    // Mirrors autopilot's colors_match: an exact rgba match at a nil/zero
+    // tolerance, otherwise an euclidean rgb distance check bounded by the
+    // tolerance.
+    fn color_matches(color: [u8; 4], pixel: image::Rgba<u8>, tolerance: Option<f64>) -> bool {
+        let tolerance = tolerance.unwrap_or(0.0);
+        let pixel = pixel.0;
+        if tolerance == 0.0 {
+            return color == pixel;
+        }
+
+        let dr = f64::from(color[0]) - f64::from(pixel[0]);
+        let dg = f64::from(color[1]) - f64::from(pixel[1]);
+        let db = f64::from(color[2]) - f64::from(pixel[2]);
+        (dr * dr + dg * dg + db * db).sqrt() <= tolerance * Self::MAX_COLOR_DELTA
     }
 
     pub fn all(&self, image_path: String, tolerance: Option<f64>) -> Vec<HashMap<String, f64>> {
@@ -148,7 +179,7 @@ impl Bitmap {
             match self.match_template_and_replace(
                 &mut image,
                 &template_image,
-                tolerance.unwrap_or(0.5)
+                tolerance.unwrap_or(0.5),
             ) {
                 Some(point) => {
                     matches.push(point);
