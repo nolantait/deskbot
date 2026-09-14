@@ -13,6 +13,15 @@ module Deskbot
       .of(Types::Integer.constrained(gteq: 0, lteq: 255))
       .constrained(size: 4)
 
+    def self.load(image_path, scale: nil)
+      provider = Providers::Autopilot::Bitmap.load(
+        Types::String[image_path],
+        Types::Float.optional[scale]
+      )
+
+      new(provider)
+    end
+
     def initialize(provider)
       @provider = provider
     end

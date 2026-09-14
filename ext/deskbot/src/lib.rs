@@ -40,6 +40,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_singleton_method("capture_screen", function!(bitmap::capture_screen, 0))?;
 
     let bitmap = module.define_class("Bitmap", ruby.class_object())?;
+    bitmap.define_singleton_method("load", function!(bitmap::Bitmap::load, 2))?;
     bitmap.define_method("bounds", method!(bitmap::Bitmap::bounds, 0))?;
     bitmap.define_method("find", method!(bitmap::Bitmap::find, 2))?;
     bitmap.define_method("all", method!(bitmap::Bitmap::all, 2))?;

@@ -26,6 +26,16 @@ impl Bitmap {
         Bitmap(bitmap)
     }
 
+    pub fn load(path: String, scale: Option<f64>) -> Result<Self, magnus::Error> {
+        match open(path) {
+            Ok(image) => Ok(Bitmap::new(autopilot::bitmap::Bitmap::new(image, scale))),
+            Err(_) => Err(Error::new(
+                Ruby::get().unwrap().exception_runtime_error(),
+                "Could not load the image",
+            )),
+        }
+    }
+
     pub fn save(&self, path: String) -> Result<bool, magnus::Error> {
         match self.0.image.save(path) {
             Ok(_) => Ok(true),
